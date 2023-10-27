@@ -11,6 +11,9 @@ from sunpy.map.maputils import all_coordinates_from_map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
+
 ###########################################################################
 # SunPy sample data contains a number of suitable images, which we will use here.
 download = 0
@@ -47,7 +50,8 @@ if instrument == 'lasco_c2':
                             sigma=[5,6,7,8,9,10,12,20], k=50, gamma=0.5, h=0.7)
 elif instrument == 'eui_fsi':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
-                            sigma=[2.5,5,10,20], k=1.1, gamma=0.8, h=0.7)
+                            sigma=[1.25,2.5,5,10], k=0.7, gamma=2, h=0.9)
+    vmin, vmax = 0, 1
 elif instrument == 'aia':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
                             sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=100, gamma=3.2, h=0.7)
