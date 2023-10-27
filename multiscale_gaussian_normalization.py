@@ -13,54 +13,72 @@ from sunpy.net import attrs as a
 
 ###########################################################################
 # SunPy sample data contains a number of suitable images, which we will use here.
+download = 0
+instrument = 'eui_fsi'
+path = 'C:/Users/rzhuo/sunpy/data/20210117/'+instrument+'/'
 
-# result = Fido.search(a.Time('2011/05/04 00:00', '2011/05/04 00:05'),
-#                      a.Instrument.aia)
-path = 'C:/Users/rzhuo/sunpy/data/example/'
-# lasco_file = Fido.fetch(result,path=path)
-lasco_file = path + 'aia_lev1_171a_2011_05_04t00_00_00_34z_image_lev1.fits'
-# lasco_file = path + 'solo_L1_eui-fsi174-image_20210117T000000168_V05.fits'
-# lasco_file = path + '22799655.fts'
-lasco_map = sunpy.map.Map(lasco_file)
+if download == 1:
+    result = Fido.search(a.Time('2021/01/17 00:00', '2021/01/17 00:30'),
+                         a.Instrument.eui,
+                         a.Level(2))
+    image_file = Fido.fetch(result,path=path)
+else:
+    if instrument == 'lasco_c2':
+        image_file = path + '22799655.fts'
+    elif instrument == 'eui_fsi':
+        image_file = path + 'solo_L2_eui-fsi174-image_20210117T000000168_V05.fits'
+    elif instrument == 'aia':
+        path = 'C:/Users/rzhuo/sunpy/data/example/'
+        image_file = path + 'aia_lev1_171a_2011_05_04t00_00_00_34z_image_lev1.fits'
+image_map = sunpy.map.Map(image_file)
 
 # The original image is plotted to showcase the difference.
 fig = plt.figure()
-ax0 = fig.add_subplot(projection=lasco_map)
-lasco_map.plot()
+ax0 = fig.add_subplot(projection=image_map)
+image_map.plot()
+plt.colorbar()
 ax0.set_title('Original')
-
-# plt.show()
 
 ###########################################################################
 # Applying Multi-scale Gaussian Normalization on a solar image.
 
-mgn_lasco = enhance.mgn(lasco_map.data.astype(float, copy=False), sigma=[1.25, 2.5, 5, 10, 20, 40], weights=[0.907,0.976,1,1,1], k=0.8, gamma=2.5, h=0.7) # aia 171
-# mgn_lasco = enhance.mgn(lasco_map.data.astype(float, copy=False), sigma=[5,6,7,8,9,10,12,20], k=0.7, gamma=0.5, h=0.5) # lasco c2
-# mgn_lasco = enhance.mgn(lasco_map.data.astype(float, copy=False), sigma=[0.625,1.25,2.5,5,10],weights=[0.599,0.907,0.976,1,1], k=0.7, gamma=0.5, h=0.5) # eui fsi
-mgn_lasco = sunpy.map.Map(mgn_lasco, lasco_map.meta)
+if instrument == 'lasco_c2':
+    mgn_image = enhance.mgn(image_map.data.astype(float, copy=False),
+                            sigma=[5,6,7,8,9,10,12,20], k=50, gamma=0.5, h=0.7)
+elif instrument == 'eui_fsi':
+    mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
+                            sigma=[2.5,5,10,20], k=1.1, gamma=0.8, h=0.7)
+elif instrument == 'aia':
+    mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
+                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=100, gamma=3.2, h=0.7)
+mgn_image = sunpy.map.Map(mgn_image, image_map.meta)
 
 fig = plt.figure()
-ax1 = fig.add_subplot(projection=mgn_lasco)
-mgn_lasco.plot()
+ax1 = fig.add_subplot(projection=mgn_image)
+mgn_image.plot()
+plt.colorbar()
 ax1.set_title('MGN')
+
+plt.show()
 
 ###########################################################################
 # Then we add a mask on MGN result.
 
-# pixel_coords = all_coordinates_from_map(mgn_lasco)
-# solar_center = SkyCoord(0*u.deg, 0*u.deg, frame=mgn_lasco.coordinate_frame)
-# pixel_radii = np.sqrt((pixel_coords.Tx-solar_center.Tx)**2 +
-#                       (pixel_coords.Ty-solar_center.Ty)**2)
-# mask_inner = pixel_radii < mgn_lasco.rsun_obs*2.4
-# mask_outer = pixel_radii > mgn_lasco.rsun_obs*6
-# final_mask = mask_inner + mask_outer
+if instrument == 'lasco_c2':
+    pixel_coords = all_coordinates_from_map(mgn_image)
+    solar_center = SkyCoord(0*u.deg, 0*u.deg, frame=mgn_image.coordinate_frame)
+    pixel_radii = np.sqrt((pixel_coords.Tx-solar_center.Tx)**2 +
+                        (pixel_coords.Ty-solar_center.Ty)**2)
+    mask_inner = pixel_radii < mgn_image.rsun_obs*2.4
+    mask_outer = pixel_radii > mgn_image.rsun_obs*6
+    final_mask = mask_inner + mask_outer
 
-# masked_lasco = sunpy.map.Map(mgn_lasco.data, mgn_lasco.meta, mask=final_mask)
+    masked_image = sunpy.map.Map(mgn_image.data, mgn_image.meta, mask=final_mask)
 
-# fig = plt.figure()
-# ax2 = fig.add_subplot(projection=masked_lasco)
-# masked_lasco.plot(axes=ax2)
-# masked_lasco.draw_limb()
-# ax2.set_title("Masked MGN LASCO C2")
+    fig = plt.figure()
+    ax2 = fig.add_subplot(projection=masked_image)
+    masked_image.plot(axes=ax2)
+    masked_image.draw_limb()
+    ax2.set_title('Masked MGN')
 
-plt.show()
+    plt.show()
