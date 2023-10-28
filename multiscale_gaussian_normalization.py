@@ -18,7 +18,7 @@ import matplotlib.colors as mcolors
 # SunPy sample data contains a number of suitable images, which we will use here.
 
 download = 0
-instrument = 'aia'
+instrument = 'lasco_c2'
 path = 'C:/Users/rzhuo/sunpy/data/20210117/'+instrument+'/'
 
 if download == 1:
@@ -48,16 +48,16 @@ ax0.set_title('Raw')
 
 if instrument == 'lasco_c2':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False),
-                            sigma=[5,6,7,8,9,10,12,20], k=50, gamma=0.5, h=0.7)
+                            sigma=[5,6,7,8,9,10,12,20], k=50, gamma=0.9, h=0.7)
     vmin, vmax = -0.1, 1.1
 elif instrument == 'eui_fsi':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
-                            sigma=[1.25,2.5,5,10], weights=[0.907,0.976,1,1],k=0.7, gamma=2, h=0.9)
+                            sigma=[1.25,2.5,5,10], weights=[0.907,0.976,1,1], k=0.7, gamma=2, h=0.9)
     vmin, vmax = 0.07, 1
 elif instrument == 'aia':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
-                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=0.7, gamma=3.2, h=0.8)
-    vmin, vmax = 0.18, 1
+                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=0.7, gamma=1.2, h=0.9)
+    vmin, vmax = -0.01, 1
 mgn_image = sunpy.map.Map(mgn_image, image_map.meta)
 
 fig = plt.figure()
