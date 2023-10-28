@@ -18,7 +18,7 @@ import matplotlib.colors as mcolors
 # SunPy sample data contains a number of suitable images, which we will use here.
 
 download = 0
-instrument = 'lasco_c2'
+instrument = 'aia'
 path = 'C:/Users/rzhuo/sunpy/data/20210117/'+instrument+'/'
 
 if download == 1:
