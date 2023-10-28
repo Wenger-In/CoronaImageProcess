@@ -41,7 +41,7 @@ fig = plt.figure()
 ax0 = fig.add_subplot(projection=image_map)
 image_map.plot()
 plt.colorbar()
-ax0.set_title('Original')
+ax0.set_title('Raw')
 
 ###########################################################################
 # Applying Multi-scale Gaussian Normalization on a solar image.
@@ -49,6 +49,7 @@ ax0.set_title('Original')
 if instrument == 'lasco_c2':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False),
                             sigma=[5,6,7,8,9,10,12,20], k=50, gamma=0.5, h=0.7)
+    vmin, vmax = -0.1, 1.1
 elif instrument == 'eui_fsi':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
                             sigma=[1.25,2.5,5,10], weights=[0.907,0.976,1,1],k=0.7, gamma=2, h=0.9)
@@ -64,8 +65,6 @@ ax1 = fig.add_subplot(projection=mgn_image)
 mgn_image.plot()
 plt.colorbar()
 ax1.set_title('MGN')
-
-plt.show()
 
 ###########################################################################
 # Then we add a mask on MGN result.
@@ -85,6 +84,7 @@ if instrument == 'lasco_c2':
     ax2 = fig.add_subplot(projection=masked_image)
     masked_image.plot(axes=ax2)
     masked_image.draw_limb()
+    plt.colorbar()
     ax2.set_title('Masked MGN')
 
-    plt.show()
+plt.show()
