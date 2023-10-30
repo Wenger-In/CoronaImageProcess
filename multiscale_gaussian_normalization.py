@@ -56,7 +56,7 @@ elif instrument == 'eui_fsi':
     vmin, vmax = 0.07, 1
 elif instrument == 'aia':
     mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
-                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=0.7, gamma=1.2, h=0.9)
+                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=0.7, gamma=3.2, h=0.7)
     vmin, vmax = -0.01, 1
 mgn_image = sunpy.map.Map(mgn_image, image_map.meta)
 
