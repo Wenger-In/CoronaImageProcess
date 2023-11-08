@@ -1,88 +1,39 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sunpy.data.sample
 import sunpy.map
-
 import sunkit_image.enhance as enhance
-
-import astropy.units as u
-from astropy.coordinates import SkyCoord
-from sunpy.map.maputils import all_coordinates_from_map
-from sunpy.net import Fido
-from sunpy.net import attrs as a
-
-import matplotlib.cm as cm
-import matplotlib.colors as mcolors
+import cv2
 
 ###########################################################################
-download = 0
-instrument = 'lasco_c2'
-path = 'C:/Users/rzhuo/sunpy/data/20210117/'+instrument+'/'
+# Read LASCO C2 raw fits to get colormaps
+raw_file = 'C:/Users/rzhuo/sunpy/data/20210117/lasco_c2/22799618.fts'
+raw_map = sunpy.map.Map(raw_file)
+cmap = raw_map.cmap
 
-if download == 1:
-    result = Fido.search(a.Time('2021/01/17 00:00', '2021/01/17 00:30'),
-                         a.Instrument.eui,
-                         a.Level(2))
-    image_file = Fido.fetch(result,path=path)
-else:
-    if instrument == 'lasco_c2':
-        image_file = path + '22799655.fts'
-    elif instrument == 'eui_fsi':
-        image_file = path + 'solo_L2_eui-fsi174-image_20210117T000000168_V05.fits'
-    elif instrument == 'aia':
-        path = 'C:/Users/rzhuo/sunpy/data/example/'
-        image_file = path + 'aia_lev1_171a_2011_05_04t00_00_00_34z_image_lev1.fits'
-image_map = sunpy.map.Map(image_file)
+# Read LASCO C2 jp2 images processed by Helioviewer.org
+jp2_path = 'E:/Research/Data/HelioViewer/LASCO_C2/20210117/'
+jp2_file = jp2_path + '2021_01_17__00_00_07_509__SOHO_LASCO_C2_white-light.jp2'
+jp2_image = cv2.imread(jp2_file, cv2.IMREAD_UNCHANGED)
 
-# The original image is plotted to showcase the difference.
-fig = plt.figure()
-ax0 = fig.add_subplot(projection=image_map)
-image_map.plot()
+# Save jp2 images as jpg images
+jpg_file = jp2_file[:-4] + '.jpg'
+cv2.imwrite(jpg_file, jp2_image, [cv2.IMWRITE_JPEG_QUALITY, 100])
+jpg_image = cv2.imread(jpg_file, cv2.IMREAD_UNCHANGED)
+jpg_image = jpg_image.astype(float, copy=False)
+
+###########################################################################
+# Plot jpg images
+plt.figure()
+plt.imshow(jpg_image,cmap=cmap)
 plt.colorbar()
-ax0.set_title('Raw')
+plt.title('Helioviewer')
 
-###########################################################################
-# Applying Multi-scale Gaussian Normalization on a solar image.
+# Apply Mulitscale Guassian Normalization
+mgn_image = enhance.mgn(jpg_image,sigma=[1.25, 2.5, 5, 10, 20],weights=[0.907,0.976,1,1,1], k=0.7, gamma=1, h=0.9)
 
-if instrument == 'lasco_c2':
-    mgn_image = enhance.mgn(image_map.data.astype(float, copy=False),
-                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=0.8, gamma=1, h=0.9)
-    vmin, vmax = -0.1, 1.1
-elif instrument == 'eui_fsi':
-    mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
-                            sigma=[1.25,2.5,5,10], weights=[0.907,0.976,1,1], k=0.7, gamma=2, h=0.9)
-    vmin, vmax = 0.07, 1
-elif instrument == 'aia':
-    mgn_image = enhance.mgn(image_map.data.astype(float, copy=False), 
-                            sigma=[1.25, 2.5, 5, 10, 20, 40],weights=[0.907,0.976,1,1,1], k=0.7, gamma=3.2, h=0.7)
-    vmin, vmax = -0.01, 1
-mgn_image = sunpy.map.Map(mgn_image, image_map.meta)
-
-fig = plt.figure()
-ax1 = fig.add_subplot(projection=mgn_image)
-mgn_image.plot()
+plt.figure()
+plt.imshow(mgn_image,cmap=cmap,vmin=0,vmax=0.8)
 plt.colorbar()
-ax1.set_title('MGN')
-
-###########################################################################
-# Then we add a mask on MGN result.
-
-if instrument == 'lasco_c2':
-    pixel_coords = all_coordinates_from_map(mgn_image)
-    solar_center = SkyCoord(0*u.deg, 0*u.deg, frame=mgn_image.coordinate_frame)
-    pixel_radii = np.sqrt((pixel_coords.Tx-solar_center.Tx)**2 +
-                        (pixel_coords.Ty-solar_center.Ty)**2)
-    mask_inner = pixel_radii < mgn_image.rsun_obs*2.4
-    mask_outer = pixel_radii > mgn_image.rsun_obs*6
-    final_mask = mask_inner + mask_outer
-
-    masked_image = sunpy.map.Map(mgn_image.data, mgn_image.meta, mask=final_mask)
-
-    fig = plt.figure()
-    ax2 = fig.add_subplot(projection=masked_image)
-    masked_image.plot(axes=ax2)
-    masked_image.draw_limb()
-    plt.colorbar()
-    ax2.set_title('Masked MGN')
+plt.title('MGN')
 
 plt.show()
