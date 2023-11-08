@@ -6,13 +6,13 @@ from sunpy.net import attrs as a
 import datetime as dt
 import matplotlib.pyplot as plt
 
-date = dt.datetime(2013,5,13,16,54)
+date = dt.datetime(2021,1,17,16,54)
 
 fig = plt.figure()
 
 # Helioviewer image
 hv = helioviewer.HelioviewerClient()
-file = hv.download_jp2(date, observatory='SOHO', instrument='LASCO', detector='C3')
+file = hv.download_jp2(date, observatory='SOHO', instrument='LASCO', detector='C2')
 data, header = read_file(file)[0]
 
 print(header['CROTA2']) # -> -173.555
