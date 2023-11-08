@@ -5,9 +5,10 @@ import sunkit_image.enhance as enhance
 import cv2
 import os
 
-save_or_not = 0
+save_or_not = 1
 
-jp2_path = 'E:/Research/Data/HelioViewer/LASCO_C2/20210117/'
+# jp2_path = 'E:/Research/Data/HelioViewer/LASCO_C2/20210117/'
+jp2_path = 'C:/Users/rzhuo/sunpy/data/'
 save_path = 'E:/Research/Work/[else]/corona_image_process/'
 
 # Read LASCO C2 raw fits to get colormaps
@@ -52,4 +53,4 @@ for root, dirs, files in os.walk(jp2_path):
                 plt.savefig(save_path + jp2_name[:21] + 'mgn.jpg', format='jpg')
 
             # plt.show()
-            # plt.close()
+            plt.close()
