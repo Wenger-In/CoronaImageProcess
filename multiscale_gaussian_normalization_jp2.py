@@ -37,6 +37,8 @@ for root, dirs, files in os.walk(jp2_path):
             plt.imshow(jpg_image,cmap=cmap)
             plt.colorbar()
             plt.title('Helioviewer@' + jp2_name[:21])
+            
+            plt.close()
 
             if save_or_not == 1:
                 plt.savefig(save_path + 'raw/' + jp2_name[:21] + 'raw.jpg', format='jpg')
