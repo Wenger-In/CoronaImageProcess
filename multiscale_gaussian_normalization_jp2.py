@@ -5,7 +5,7 @@ import sunkit_image.enhance as enhance
 import cv2
 import os
 
-save_or_not = 1
+save_or_not = 0
 
 jp2_path = 'E:/Research/Data/HelioViewer/LASCO_C2/20210117/'
 # jp2_path = 'C:/Users/rzhuo/sunpy/data/'
