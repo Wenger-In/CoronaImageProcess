@@ -18,7 +18,7 @@ cmap = raw_map.cmap
 # Select observation slit
 center_x = 512
 center_y = 512
-radius = 400
+radius = 350
 dtheta = 0.005
 x_slit = []
 y_slit = []
