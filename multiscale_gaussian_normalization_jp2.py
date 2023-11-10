@@ -59,7 +59,7 @@ for root, dirs, files in os.walk(jp2_path):
                 plt.savefig(save_path + 'raw/' + jp2_name[:20] + 'raw.jpg', format='jpg')
 
             # Apply Mulitscale Guassian Normalization
-            mgn_image = enhance.mgn(jpg_image,sigma=[1.25, 2.5, 5, 10, 20],weights=[0.907,0.976,1,1,1], k=0.7, gamma=1, h=0.9)
+            mgn_image = enhance.mgn(jpg_image,sigma=[1.25, 2.5, 5, 10, 20],weights=[0.907,0.976,1,1,1], k=0.8, gamma=1, h=0.9)
             
             # Extract slit observations
             slit_pixels = [mgn_image[y, x] for x, y in zip(x_slit, y_slit)]
@@ -73,7 +73,7 @@ for root, dirs, files in os.walk(jp2_path):
             plt.imshow(mgn_image,cmap=cmap,vmin=0,vmax=0.8)
             plt.colorbar()
             plt.scatter(x_slit,y_slit,c='k')
-            plt.title('MGN@' + jp2_name[:21])
+            plt.title('MGN@' + jp2_name[:20])
 
             if save_or_not == 1:
                 plt.savefig(save_path + 'mgn/' + jp2_name[:20] + 'mgn.jpg', format='jpg')
