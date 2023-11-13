@@ -84,7 +84,7 @@ for root, dirs, files in os.walk(jp2_path):
 slit_image_array = np.column_stack(slit_image)
 
 plt.figure(figsize=(12,8))
-plt.pcolor(slit_image_array,cmap=cmap,vmin=0,vmax=0.8)
+plt.pcolor(slit_image_array,cmap='seismic',vmin=0.25,vmax=0.5)
 plt.colorbar()
 plt.title('slit observation')
 
