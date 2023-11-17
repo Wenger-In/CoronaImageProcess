@@ -23,7 +23,7 @@ dtheta = 0.005
 x_slit = []
 y_slit = []
 
-for theta in np.arange(np.pi/3, 3*np.pi/4, dtheta):
+for theta in np.arange(0, 2*np.pi, dtheta):
     x = int(center_x - radius * np.sin(theta))
     y = int(center_y - radius * np.cos(theta))
     if not x_slit or not (x == x_slit[-1] and y == y_slit[-1]):
@@ -87,5 +87,23 @@ plt.figure(figsize=(12,8))
 plt.pcolor(slit_image_array,cmap='seismic',vmin=0.25,vmax=0.5)
 plt.colorbar()
 plt.title('slit observation')
+
+# Split when there is no LASCO C2 data
+split_1, split_2 = 15, 27
+
+split_array = np.hsplit(slit_image_array, [split_1, split_2])
+nan_array_1 = np.full((1257, 5), np.nan) # 24
+nan_array_2 = np.full((1257, 5), np.nan) # 34
+
+# Insert nan arrays
+slit_image_array_1 = np.hstack([split_array[0], nan_array_1])
+slit_image_array_2 = split_array[1]
+slit_image_array_3 = np.hstack([nan_array_2, split_array[2]])
+slit_image_merged = np.hstack([slit_image_array_1, slit_image_array_2, slit_image_array_3])
+
+plt.figure(figsize=(12,8))
+plt.pcolor(slit_image_merged,cmap='seismic',vmin=0.25,vmax=0.5)
+plt.colorbar()
+plt.title('slit observation merged')
 
 plt.show()
