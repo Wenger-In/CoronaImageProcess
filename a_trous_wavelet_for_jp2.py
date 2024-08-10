@@ -10,14 +10,14 @@ from scipy import fftpack, signal
 import CoronaImageProcess_utils
 from CoronaImageProcess_utils import build_atrous_coef, a_trous_wavelet_2D
 
-save_or_not = 0
+save_or_not = 1
 
 # preparation
 '''HelioViewer JP2 data download url: https://helioviewer.org/jp2/'''
 
 # data path 
-jp2_path = 'E:/Research/Data/HelioViewer/LASCO_C2/20211007/'
-save_path = 'E:/Research/Work/tianwen_IPS/m1a07x_up/LASCO_observation/'
+jp2_path = 'E:/Research/Data/HelioViewer/LASCO_C2/20211004/'
+save_path = 'E:/Research/Work/tianwen_IPS/LASCO_obs/20211004/'
 
 for root, dirs, files in os.walk(jp2_path):
     for file in files:

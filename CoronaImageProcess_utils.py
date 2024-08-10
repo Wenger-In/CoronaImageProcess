@@ -76,18 +76,18 @@ def interp_to_slit(image, x_slit, y_slit):
     X, Y = np.meshgrid(x, y)
 
     # # Interpolate with griddata
-    # interp_array = griddata((X.flatten(), Y.flatten()), image.flatten(), (x_slit, y_slit), method='cubic')
+    # interp_array = griddata((X.flatten(), Y.flatten()), image.flatten(), (x_slit, y_slit), method='linear')
     # slit_pixels = interp_array.reshape(x_slit.shape)
     
     # Interpolate with interp2d
-    interpfun = interp2d(x, y, image, kind='cubic')
+    interpfun = interp2d(x, y, image, kind='linear')
     interp_matrix = interpfun(x_slit, y_slit)
     interp_array = np.diagonal(interp_matrix)
     slit_pixels = interp_array.reshape(x_slit.shape)
     
     return slit_pixels
 
-def radial_slit(beg_point, end_point, min_y, step=0.1):
+def radial_slit(beg_point, end_point, min_x, min_y, step=0.1):
     beg_x, beg_y = beg_point
     end_x, end_y = end_point
     direct = np.array([end_x - beg_x, end_y - beg_y])
@@ -97,8 +97,15 @@ def radial_slit(beg_point, end_point, min_y, step=0.1):
     while True:
         new_x = x_slit[-1] + step * e_direct[0]
         new_y = y_slit[-1] + step * e_direct[1]
-        if new_y < min_y:
+        if new_x < min_x or new_y < min_y:
             break
         x_slit.append(new_x)
         y_slit.append(new_y)
     return np.array(x_slit), np.array(y_slit)
+
+def insert_nan_columns(image, insertions):
+    for col, num_insertions in insertions:
+        for _ in range(num_insertions):
+            image = np.insert(image, col, np.nan, axis=1)
+            col += 1
+    return image
